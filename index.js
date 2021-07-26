@@ -307,21 +307,27 @@ const SiteObserver = (() => {
         const addToDoButton = document.querySelector('button#add-todo-button');
         addToDoButton.addEventListener('click', () => {
             DomManipulator.openToDoForm();
+            _observeToDoForm();
         });
     };
 
     const _observeProjectForm = () => {
-        const submitForm = document.querySelector('form#project-form');
+        const submitForm = document.querySelector('form#add-project-form');
+        const closeButton = document.querySelector('button#close-project-form');
         submitForm.addEventListener('submit', () => {
             const title = submitForm.elements['title'].value;
             ProjectController.addProject(title);
             DomManipulator.newProjectDom(title);
 
         });
+        closeButton.addEventListener('click', () => {
+            DomManipulator.closeForm(submitForm);
+        })
     };
 
     const _observeToDoForm = () => {
-        const submitForm = document.querySelector('form#to-do-form');
+        const submitForm = document.querySelector('form#add-to-do-form');
+        const closeButton = document.querySelector('button#close-to-do-form');
         submitForm.addEventListener('submit', () => {
             const title = submitForm.elements['title'].value;
             const description = submitForm.elements['description'].value;
@@ -332,7 +338,11 @@ const SiteObserver = (() => {
             DomManipulator.newToDoDom(title, description, dueDate, priority, notes);
 
         });
+        closeButton.addEventListener('click', () => {
+            DomManipulator.closeForm(submitForm);
+        })
     };
+
     
 
 })();
