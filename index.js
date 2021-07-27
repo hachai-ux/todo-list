@@ -20,7 +20,7 @@ const ToDoFactory = (title, description, dueDate, priority, notes) => {
 };
  
 //projects carry name and a todo list
-const ProjectsFactory = (title, toDoList) => {
+const ProjectsFactory = (title) => {
     let toDoList = [];
     const getTitle = () => title;
     const getToDoList = () => toDoList;
@@ -30,18 +30,19 @@ const ProjectsFactory = (title, toDoList) => {
 //manages a list of projects
 const ProjectController = (() => {
     let projectList = [];
-    const addProject = (title) => {
-        projectList.push(title);
+    const addProject = (project) => {
+        projectList.push(project);
     };
     const getProjectList = () => projectList;
 
     return{addProject, getProjectList}
 })();
 
+
 //manages the todo-list for each project
 const ToDoController = (() => {
     //add a todo to a project
-    const addToDo = (todo, project) => {
+    const addToDo = (toDo, project) => {
         project.getToDoList().push(toDo);
     };
 
@@ -85,38 +86,43 @@ console.log(project2.getToDoList()[0].getTitle());
 
 const DomManipulator = (() => {
     //load initial sidebar dom with projects
-    const loadSideBarDom = () => {
+    const loadProjectButton = () => {
         const sidebar = document.querySelector('div#sidebar');
         const addProjectButton = document.createElement('button');
 
         addProjectButton.setAttribute('id','add-project-button');
         addProjectButton.textContent = "Add Project";
     
-        content.appendChild(addToDoButton);
+        sidebar.appendChild(addProjectButton);
 
     };
    //load content dom with todos
-    const loadContentDom = () => {
+    const loadToDoButton = () => {
         const content = document.querySelector('div#content');
         const addToDoButton = document.createElement('button');
 
         addToDoButton.setAttribute('id','add-todo-button');
         addToDoButton.textContent = "Add To-Do";
 
-        sidebar.appendChild(addProjectButton);
+        content.appendChild(addToDoButton);
 
         
     };
 
    const newProjectDom = (title) => {
-        const project = document.createElement('div');
+        const project = document.createElement('button');
         const sidebar = document.querySelector('div#sidebar');
         project.classList.add('project');
+        //project.setAttribute('id', `${title}-project-title`);
         project.textContent = title;
         sidebar.appendChild(project);
+
+        return project;
+
    };
 
-   const newToDoDom = (title, description, dueDate, priority, notes) => {
+   const _newToDoDom = (title, description, dueDate, priority, notes) => {
+        const toDoList = document.createElement('div');
         const toDo = document.createElement('div');
         const toDoTitle = document.createElement('p');
         const toDoDescription = document.createElement('p');
@@ -124,6 +130,7 @@ const DomManipulator = (() => {
         const toDoPriority = document.createElement('p');
         const toDoNotes = document.createElement('p');
 
+        toDoList.classList.add('to-do-list');
         toDo.classList.add('to-do');
 
         toDoTitle.textContent = title;
@@ -139,7 +146,8 @@ const DomManipulator = (() => {
         toDo.appendChild(toDoDueDate);
         toDo.appendChild(toDoPriority);
         toDo.appendChild(toDoNotes);
-        content.appendChild(toDo);
+        toDoList.appendChild(toDo);
+        content.appendChild(toDoList);
 
    };
 
@@ -179,7 +187,7 @@ const DomManipulator = (() => {
         body.removeChild(form);
    };
 
-   const openToDoForm = (title, description, dueDate, priority, notes) => {
+   const openToDoForm = () => {
     const form = document.createElement('form');
     const body = document.querySelector('body');
     const labelTitle = document.createElement('label');
@@ -282,12 +290,32 @@ const DomManipulator = (() => {
     body.appendChild(form);
    };
 
+   const viewToDoList = (toDoList) => {
+        //get todos associated with the project
+        //load todo dom
+        toDoList.forEach((toDo) => {
+            const title = toDo.getTitle();
+            const description = toDo.getDescription();
+            const dueDate = toDo.getDueDate();
+            const priority = toDo.getPriority();
+            const notes = toDo.getNotes();
+            _newToDoDom(title, description, dueDate, priority, notes);
+        });
+   };
+
+   const clearToDoListDom = () => {
+        const content = document.querySelector('div#content');
+        const toDoListDom = document.querySelector('div.to-do-list');
+        content.removeChild(toDoListDom);
+   };
     
 })();
 
 
 
-const SiteObserver = (() => {
+const SiteFacilitator = (() => {
+    const domModelProjectMap = new Map();
+    const projectToDoListMap = new Map();
     //Observes and facilitate logic through event listeners
     //Handler?
     //add project button
@@ -316,8 +344,11 @@ const SiteObserver = (() => {
         const closeButton = document.querySelector('button#close-project-form');
         submitForm.addEventListener('submit', () => {
             const title = submitForm.elements['title'].value;
-            ProjectController.addProject(title);
-            DomManipulator.newProjectDom(title);
+            const project = ProjectsFactory(title);
+            ProjectController.addProject(project);
+            const projectDom = DomManipulator.newProjectDom(title);
+            _domModelProjectAssociator(projectDom, project);
+            
 
         });
         closeButton.addEventListener('click', () => {
@@ -334,14 +365,50 @@ const SiteObserver = (() => {
             const dueDate = submitForm.elements['due-date'].value;
             const priority = submitForm.elements['priority'].value;
             const notes = submitForm.elements['notes'].value;
-            ToDoController.addToDo(title, description, dueDate, priority, notes);
-            DomManipulator.newToDoDom(title, description, dueDate, priority, notes);
+            const toDo = ToDoFactory(title, description, dueDate, priority, notes);
+            const openProject = _getOpenProject();
+
+            ToDoController.addToDo(toDo, openProject);
+            DomManipulator.clearToDoListDom();
+            DomManipulator.viewToDoList(toDoList);
 
         });
         closeButton.addEventListener('click', () => {
             DomManipulator.closeForm(submitForm);
         })
     };
+
+    const observeProjectButtons = () => {
+        const projectButtons = document.querySelectorAll('button.project');
+        projectButtons.forEach((projectButton)=>{
+            //get stuff
+            //no anonymous function because duplicate ones would not be the same
+            //find project object that is connected to the dom
+
+            //when dom is clicked, get it's project model
+            //once project model is selected, get it's todo model
+            //the todo model calls todo dom
+            function callbackViewToDo(e){
+                const project = _domModelProjectAssociator.get(e.target);
+                const toDoList = project.getToDoList();
+                viewToDoList(toDoList);
+                
+            }
+            projectButton.addEventListener('click', callbackViewToDo);
+        })
+    }
+
+    const _domModelProjectAssociator = (domElement, modelElement) => {
+        domModelProjectMap.set(domElement, modelElement);
+    };
+
+
+    /*
+    //project already has individual toDoList
+    const _projectToToDoAssociator = (project, toDoList) => {
+        projectToDoListMap.set(project, toDoList);
+    };
+    */
 
     
 
@@ -352,4 +419,12 @@ const SiteObserver = (() => {
 //change todo priority +1
 //change name etc.
 
-//DOM modules
+//DOM modules +1
+
+//execute functions on load
+//recognize which project page is open for the to-dos
+//getOpenProject function
+//setOpenProject function(has to do with dom?)
+//where to put getOpenProject?
+
+//connect dom element to the project object(map or iterating over ids?)
