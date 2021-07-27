@@ -101,15 +101,6 @@ const DomManipulator = (() => {
         
     };
 
-    const loadToDoList = () => {
-        const toDoList = document.createElement('div');
-        const content = document.querySelector('div#content');
-        toDoList.classList.add('to-do-list');
-        toDoList.textContent = "To-Dos";
-
-        content.appendChild(toDoListElement);
-        
-    };
 
    const newProjectDom = (title) => {
         const project = document.createElement('button');
@@ -163,24 +154,26 @@ const DomManipulator = (() => {
     
         form.setAttribute('id', 'add-project-form');
         form.setAttribute('onsubmit', 'return false');
-        label.classList('form-element');
+        label.classList.add('form-element');
         label.setAttribute('for', 'title');
         label.textContent = "Project Name";
-        input.classList('form-element');
+        input.classList.add('form-element');
         input.setAttribute('type','text');
         input.setAttribute('name','title');
         input.required = true;
-        submit.classList('form-element');
+        submit.classList.add('form-element');
         submit.setAttribute('type', 'submit');
         submit.setAttribute('id', 'submit-project');
         submit.textContent = "Add Project";
-        close.classList('form-element');
-        close.setAttribute('type', 'submit');
+        close.classList.add('form-element');
+        close.setAttribute('type', 'button');
         close.setAttribute('id', 'close-project-form');
         close.textContent = "Cancel";
 
         form.appendChild(label);
         form.appendChild(input);
+        form.appendChild(submit);
+        form.appendChild(close);
         body.appendChild(form);
    }
 
@@ -198,6 +191,8 @@ const DomManipulator = (() => {
     const inputDescription = document.createElement('input');
     const labelDueDate = document.createElement('label');
     const inputDueDate = document.createElement('input');
+    const labelPriorityNone = document.createElement('label');
+    const inputPriorityNone = document.createElement('input');
     const labelPriorityLow = document.createElement('label');
     const inputPriorityLow = document.createElement('input');
     const labelPriorityMedium = document.createElement('label');
@@ -212,65 +207,73 @@ const DomManipulator = (() => {
     form.setAttribute('id', 'add-to-do-form');
     form.setAttribute('onsubmit', 'return false');
 
-    labelTitle.classList('form-element');
+    labelTitle.classList.add('form-element');
     labelTitle.setAttribute('for', 'title');
     labelTitle.textContent = "Title";
-    inputTitle.classList('form-element');
+    inputTitle.classList.add('form-element');
     inputTitle.setAttribute('type','text');
     inputTitle.setAttribute('name','title');
     inputTitle.required = true;
 
-    labelDescription.classList('form-element');
+    labelDescription.classList.add('form-element');
     labelDescription.setAttribute('for', 'description');
     labelDescription.textContent = "Description";
-    inputDescription.classList('form-element');
+    inputDescription.classList.add('form-element');
     inputDescription.setAttribute('type','text');
     inputDescription.setAttribute('name','description');
 
-    labelDueDate.classList('form-element');
+    labelDueDate.classList.add('form-element');
     labelDueDate.setAttribute('for', 'due-date');
     labelDueDate.textContent = "Due Date";
-    inputDueDate.classList('form-element');
+    inputDueDate.classList.add('form-element');
     inputDueDate.setAttribute('type','date');
     inputDueDate.setAttribute('name','due-date');
 
     //radio buttons
-    labelPriorityLow.classList('form-element');
+    labelPriorityNone.classList.add('form-element');
+    labelPriorityNone.setAttribute('for', 'priority');
+    labelPriorityNone.textContent = "No Priority";
+    inputPriorityNone.classList.add('form-element');
+    inputPriorityNone.setAttribute('type','radio');
+    inputPriorityNone.setAttribute('name','priority');
+    inputPriorityNone.setAttribute('value','');
+
+    labelPriorityLow.classList.add('form-element');
     labelPriorityLow.setAttribute('for', 'priority');
     labelPriorityLow.textContent = "Low Priority";
-    inputPriorityLow.classList('form-element');
+    inputPriorityLow.classList.add('form-element');
     inputPriorityLow.setAttribute('type','radio');
     inputPriorityLow.setAttribute('name','priority');
     inputPriorityLow.setAttribute('value','low-priority');
 
-    labelPriorityMedium.classList('form-element');
+    labelPriorityMedium.classList.add('form-element');
     labelPriorityMedium.setAttribute('for', 'priority');
     labelPriorityMedium.textContent = "Medium Priority";
-    inputPriorityMedium.classList('form-element');
+    inputPriorityMedium.classList.add('form-element');
     inputPriorityMedium.setAttribute('type','radio');
     inputPriorityMedium.setAttribute('name','priority');
     inputPriorityMedium.setAttribute('name','medium-priority');
 
-    labelPriorityHigh.classList('form-element');
+    labelPriorityHigh.classList.add('form-element');
     labelPriorityHigh.setAttribute('for', 'priority');
     labelPriorityHigh.textContent = "High Priority";
-    inputPriorityHigh.classList('form-element');
+    inputPriorityHigh.classList.add('form-element');
     inputPriorityHigh.setAttribute('type','radio');
     inputPriorityHigh.setAttribute('name','priority');
     inputPriorityHigh.setAttribute('name','high-priority');
 
-    labelNotes.classList('form-element');
+    labelNotes.classList.add('form-element');
     labelNotes.setAttribute('for', 'notes');
     labelNotes.textContent = "Notes";
-    inputNotes.classList('form-element');
+    inputNotes.classList.add('form-element');
     inputNotes.setAttribute('type','text');
     inputNotes.setAttribute('name','notes');
 
-    submit.classList('form-element');
+    submit.classList.add('form-element');
     submit.setAttribute('type', 'submit');
     submit.setAttribute('id', 'submit-to-do');
     submit.textContent = "Add Project";
-    close.classList('form-element');
+    close.classList.add('form-element');
     close.setAttribute('type', 'submit');
     close.setAttribute('id', 'close-to-do-form');
     close.textContent = "Cancel";
@@ -281,18 +284,30 @@ const DomManipulator = (() => {
     form.appendChild(inputDescription);
     form.appendChild(labelDueDate);
     form.appendChild(inputDueDate);
+    form.appendChild(labelPriorityNone);
+    form.appendChild(inputPriorityNone);
     form.appendChild(labelPriorityLow);
     form.appendChild(inputPriorityLow);
     form.appendChild(labelPriorityMedium);
     form.appendChild(inputPriorityMedium);
     form.appendChild(labelPriorityHigh);
     form.appendChild(inputPriorityHigh);
-    form.appendChild(labelPriorityNotes);
-    form.appendChild(inputPriorityNotes);
+    form.appendChild(labelNotes);
+    form.appendChild(inputNotes);
+    form.appendChild(submit);
+    form.appendChild(close);
     body.appendChild(form);
    };
 
-   const viewToDoList = (toDoList) => {
+   const loadToDoList = (toDoList) => {
+        //to-do-list div
+        const toDoListDom = document.createElement('div');
+        const content = document.querySelector('div#content');
+        toDoListDom.classList.add('to-do-list');
+        toDoListDom.textContent = "To-Dos";
+
+        content.appendChild(toDoListDom);
+    
         //get todos associated with the project
         //load todo dom
         toDoList.forEach((toDo) => {
@@ -311,46 +326,60 @@ const DomManipulator = (() => {
         content.removeChild(toDoListDom);
    };
     
+   return {loadProjectButton, loadToDoButton, loadProjectList, newProjectDom, openProjectForm, closeForm, openToDoForm, loadToDoList, clearToDoListDom};
 })();
 
 
 
 const SiteFacilitator = (() => {
     const domModelProjectMap = new Map();
-    const projectToDoListMap = new Map();
     //Observes and facilitate logic through event listeners
     //Handler?
     //add project button
     const observeProjectButton = () => {
         const addProjectButton = document.querySelector('button#add-project-button');
+        
         addProjectButton.addEventListener('click', () => {
             //add form to dom
+            const existingForm = document.querySelector('form#add-project-form');
+            if (existingForm === null){
             DomManipulator.openProjectForm();
             _observeProjectForm();
+            };
         });
+        
             
 
     };
     
 
-    const observeToDoButton = () => {
+    const _observeToDoButton = (project) => {
         const addToDoButton = document.querySelector('button#add-todo-button');
         addToDoButton.addEventListener('click', () => {
+            const existingForm = document.querySelector('form#add-to-do-form');
+            if(existingForm === null){
             DomManipulator.openToDoForm();
-            _observeToDoForm();
+            _observeToDoForm(project);
+            };
         });
     };
+
+    const createProject = (title) => {
+            const project = ProjectsFactory(title);
+            //add project to project list
+            ProjectController.addProject(project);
+            const projectDom = DomManipulator.newProjectDom(title);
+            //associate project dom to project
+            _domModelProjectAssociator(projectDom, project);
+    }
 
     const _observeProjectForm = () => {
         const submitForm = document.querySelector('form#add-project-form');
         const closeButton = document.querySelector('button#close-project-form');
         submitForm.addEventListener('submit', () => {
             const title = submitForm.elements['title'].value;
-            const project = ProjectsFactory(title);
-            ProjectController.addProject(project);
-            const projectDom = DomManipulator.newProjectDom(title);
-            _domModelProjectAssociator(projectDom, project);
-            
+            createProject(title);
+            DomManipulator.closeForm(submitForm);
 
         });
         closeButton.addEventListener('click', () => {
@@ -358,7 +387,7 @@ const SiteFacilitator = (() => {
         })
     };
 
-    const _observeToDoForm = () => {
+    const _observeToDoForm = (project) => {
         const submitForm = document.querySelector('form#add-to-do-form');
         const closeButton = document.querySelector('button#close-to-do-form');
         submitForm.addEventListener('submit', () => {
@@ -368,16 +397,18 @@ const SiteFacilitator = (() => {
             const priority = submitForm.elements['priority'].value;
             const notes = submitForm.elements['notes'].value;
             const toDo = ToDoFactory(title, description, dueDate, priority, notes);
-            const openProject = _getOpenProject();
-
-            ToDoController.addToDo(toDo, openProject);
+            //current open project to-dos
+            let toDoList = project.getToDoList();
+            ToDoController.addToDo(toDo, project);
             DomManipulator.clearToDoListDom();
-            DomManipulator.viewToDoList(toDoList);
+            DomManipulator.loadToDoList(toDoList);
+            DomManipulator.closeForm(submitForm);
 
         });
         closeButton.addEventListener('click', () => {
             DomManipulator.closeForm(submitForm);
-        })
+            
+        });
     };
 
     const observeProjectButtons = () => {
@@ -391,37 +422,55 @@ const SiteFacilitator = (() => {
             //once project model is selected, get it's todo model
             //the todo model calls todo dom
             function callbackViewToDo(e){
-                const project = _domModelProjectAssociator.get(e.target);
+                const project = domModelProjectMap.get(e.target);
+                console.log(domModelProjectMap);
                 const toDoList = project.getToDoList();
-                viewToDoList(toDoList);
+                //Load to-do stuff
+                DomManipulator.loadToDoButton();
+                DomManipulator.loadToDoList(toDoList);
+                _observeToDoButton(project);
                 
-            }
+            };
             projectButton.addEventListener('click', callbackViewToDo);
-        })
-    }
+        });
+    };
 
     const _domModelProjectAssociator = (domElement, modelElement) => {
         domModelProjectMap.set(domElement, modelElement);
     };
+
+    return {observeProjectButton, observeProjectButtons, createProject};
 })();
 
 //first time loading site
 const OnLoad = (() => {
-    const defaultProject = ProjectsFactory("Default Project");
-    
-    const addDefaultProject = (() => {
-        ProjectController.addProject(defaultProject);
-        DomManipulator.newProjectDom(defaultProject)
-        });
-    
 
-    return {addDefaultProject};
+    
+    const loadInitialUI = () => {
+        DomManipulator.loadProjectButton();
+        DomManipulator.loadProjectList();
+    };
+    const addDefaultProject = () => {
+        const title = "Default Project";
+        SiteFacilitator.createProject(title);
+        };
+    
+    const loadObservers = () => {
+        SiteFacilitator.observeProjectButton();
+        SiteFacilitator.observeProjectButtons();
+
+    }
+
+    return {loadInitialUI, addDefaultProject, loadObservers};
 })();
 
 
-
+OnLoad.loadInitialUI();
 OnLoad.addDefaultProject();
+OnLoad.loadObservers();
 
+/*
+//mockup testing
 const project2 = ProjectsFactory("Project 2");
 const toDo1 = TodoFactory("Name", "Description", "DueDate", "Priority", "Notes");
 //add a project to project list
@@ -431,6 +480,7 @@ ToDoController.addToDo(toDo1, project2);
 console.log(ProjectController.getProjectList());
 //get title of todo in project 2
 console.log(project2.getToDoList()[0].getTitle());
+*/
 
 //backlog:
 
@@ -449,3 +499,12 @@ console.log(project2.getToDoList()[0].getTitle());
 //connect dom element to the project object(map or iterating over ids?) +1
 
 //view all projects
+
+//make into ES6 modules
+//webpack
+
+//open form only once until it's closed +1
+//createProject module+1
+
+//make new project button work
+
