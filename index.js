@@ -63,25 +63,7 @@ const ToDoController = (() => {
     return{addToDo, completeToDo, changePriority}
 })();
 
-//first time loading site
-const OnLoad = (() => {
-    const defaultProject = ProjectsFactory("Default Project");
-    const addDefaultProject = () => ProjectController.addProject(defaultProject);
-    return {addDefaultProject};
-})();
 
-
-
-OnLoad.addDefaultProject();
-const project2 = ProjectsFactory("Project 2");
-const toDo1 = TodoFactory("Name", "Description", "DueDate", "Priority", "Notes");
-//add a project to project list
-ProjectController.addProject(project2);
-//add todo to a project
-ToDoController.addToDo(toDo1, project2);
-console.log(ProjectController.getProjectList());
-//get title of todo in project 2
-console.log(project2.getToDoList()[0].getTitle());
 
 
 const DomManipulator = (() => {
@@ -109,20 +91,42 @@ const DomManipulator = (() => {
         
     };
 
+    const loadProjectList = () => {
+        const projectList = document.createElement('div');
+        const sidebar = document.querySelector('div#sidebar');
+        projectList.setAttribute('id', 'project-list');
+        projectList.textContent = "Projects"
+
+        sidebar.appendChild(projectList);
+        
+    };
+
+    const loadToDoList = () => {
+        const toDoList = document.createElement('div');
+        const content = document.querySelector('div#content');
+        toDoList.classList.add('to-do-list');
+        toDoList.textContent = "To-Dos";
+
+        content.appendChild(toDoListElement);
+        
+    };
+
    const newProjectDom = (title) => {
         const project = document.createElement('button');
-        const sidebar = document.querySelector('div#sidebar');
+        const projectList = document.querySelector('div#project-list');
         project.classList.add('project');
         //project.setAttribute('id', `${title}-project-title`);
         project.textContent = title;
-        sidebar.appendChild(project);
+        projectList.appendChild(project);
 
         return project;
 
    };
 
    const _newToDoDom = (title, description, dueDate, priority, notes) => {
-        const toDoList = document.createElement('div');
+        //get the right to-do list for the right project then append the element to that object.
+        //only add to-do to dom if that to-do list is loaded
+        const toDoList = document.querySelector('div.to-do-list'); //selects the first loaded to-do list
         const toDo = document.createElement('div');
         const toDoTitle = document.createElement('p');
         const toDoDescription = document.createElement('p');
@@ -130,7 +134,6 @@ const DomManipulator = (() => {
         const toDoPriority = document.createElement('p');
         const toDoNotes = document.createElement('p');
 
-        toDoList.classList.add('to-do-list');
         toDo.classList.add('to-do');
 
         toDoTitle.textContent = title;
@@ -147,7 +150,6 @@ const DomManipulator = (() => {
         toDo.appendChild(toDoPriority);
         toDo.appendChild(toDoNotes);
         toDoList.appendChild(toDo);
-        content.appendChild(toDoList);
 
    };
 
@@ -401,18 +403,35 @@ const SiteFacilitator = (() => {
     const _domModelProjectAssociator = (domElement, modelElement) => {
         domModelProjectMap.set(domElement, modelElement);
     };
+})();
 
-
-    /*
-    //project already has individual toDoList
-    const _projectToToDoAssociator = (project, toDoList) => {
-        projectToDoListMap.set(project, toDoList);
-    };
-    */
-
+//first time loading site
+const OnLoad = (() => {
+    const defaultProject = ProjectsFactory("Default Project");
+    
+    const addDefaultProject = (() => {
+        ProjectController.addProject(defaultProject);
+        DomManipulator.newProjectDom(defaultProject)
+        });
     
 
+    return {addDefaultProject};
 })();
+
+
+
+OnLoad.addDefaultProject();
+
+const project2 = ProjectsFactory("Project 2");
+const toDo1 = TodoFactory("Name", "Description", "DueDate", "Priority", "Notes");
+//add a project to project list
+ProjectController.addProject(project2);
+//add todo to a project
+ToDoController.addToDo(toDo1, project2);
+console.log(ProjectController.getProjectList());
+//get title of todo in project 2
+console.log(project2.getToDoList()[0].getTitle());
+
 //backlog:
 
 //set todos as complete +1
@@ -427,4 +446,6 @@ const SiteFacilitator = (() => {
 //setOpenProject function(has to do with dom?)
 //where to put getOpenProject?
 
-//connect dom element to the project object(map or iterating over ids?)
+//connect dom element to the project object(map or iterating over ids?) +1
+
+//view all projects
