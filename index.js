@@ -114,9 +114,12 @@ const DomManipulator = (() => {
 
    };
 
-   const _newToDoDom = (title, description, dueDate, priority, notes) => {
+   const _newToDoDom = (title, dueDate) => {
         //get the right to-do list for the right project then append the element to that object.
         //only add to-do to dom if that to-do list is loaded
+
+        /*
+        //code with all elements
         const toDoList = document.querySelector('div.to-do-list'); //selects the first loaded to-do list
         const toDo = document.createElement('div');
         const toDoTitle = document.createElement('p');
@@ -141,7 +144,30 @@ const DomManipulator = (() => {
         toDo.appendChild(toDoPriority);
         toDo.appendChild(toDoNotes);
         toDoList.appendChild(toDo);
+        */
+       //code showing only title
 
+       const toDoList = document.querySelector('div.to-do-list'); //selects the first loaded to-do list
+       const toDo = document.createElement('button');
+       const toDoTitle = document.createElement('p');
+       const toDoDueDate = document.createElement('p');
+ 
+
+       toDo.classList.add('to-do');
+
+       toDoTitle.textContent = title;
+
+       if(dueDate !== ''){
+        toDoDueDate.textContent = 'Due: ' + dueDate;
+       };
+    
+
+
+       toDo.appendChild(toDoTitle);
+       toDo.appendChild(toDoDueDate);
+       toDoList.appendChild(toDo);
+
+       return toDo;
    };
 
    const openProjectForm = () => {
@@ -272,9 +298,9 @@ const DomManipulator = (() => {
     submit.classList.add('form-element');
     submit.setAttribute('type', 'submit');
     submit.setAttribute('id', 'submit-to-do');
-    submit.textContent = "Add Project";
+    submit.textContent = "Add To-Do";
     close.classList.add('form-element');
-    close.setAttribute('type', 'submit');
+    close.setAttribute('type', 'button');
     close.setAttribute('id', 'close-to-do-form');
     close.textContent = "Cancel";
 
@@ -305,6 +331,7 @@ const DomManipulator = (() => {
         const content = document.querySelector('div#content');
         toDoListDom.classList.add('to-do-list');
         toDoListDom.textContent = "To-Dos";
+        const toDoDomArray = [];
 
         content.appendChild(toDoListDom);
     
@@ -316,23 +343,35 @@ const DomManipulator = (() => {
             const dueDate = toDo.getDueDate();
             const priority = toDo.getPriority();
             const notes = toDo.getNotes();
-            _newToDoDom(title, description, dueDate, priority, notes);
+            const toDoDom = _newToDoDom(title, dueDate);
+            toDoDomArray.push(toDoDom);
         });
+
+        return toDoDomArray;
    };
 
-   const clearToDoListDom = () => {
+   const clearToDoContent = () => {
         const content = document.querySelector('div#content');
         const toDoListDom = document.querySelector('div.to-do-list');
-        content.removeChild(toDoListDom);
+        const addToDoButton = document.querySelector('button#add-todo-button');
+
+        if(toDoListDom !== null){
+            content.removeChild(toDoListDom);
+        };
+        if(addToDoButton!== null){
+            content.removeChild(addToDoButton);
+        };
+        
    };
     
-   return {loadProjectButton, loadToDoButton, loadProjectList, newProjectDom, openProjectForm, closeForm, openToDoForm, loadToDoList, clearToDoListDom};
+   return {loadProjectButton, loadToDoButton, loadProjectList, newProjectDom, openProjectForm, closeForm, openToDoForm, loadToDoList, clearToDoContent};
 })();
 
 
 
 const SiteFacilitator = (() => {
     const domModelProjectMap = new Map();
+    const domModelToDoMap = new Map();
     //Observes and facilitate logic through event listeners
     //Handler?
     //add project button
@@ -357,6 +396,7 @@ const SiteFacilitator = (() => {
         const addToDoButton = document.querySelector('button#add-todo-button');
         addToDoButton.addEventListener('click', () => {
             const existingForm = document.querySelector('form#add-to-do-form');
+            console.log(existingForm);
             if(existingForm === null){
             DomManipulator.openToDoForm();
             _observeToDoForm(project);
@@ -371,6 +411,7 @@ const SiteFacilitator = (() => {
             const projectDom = DomManipulator.newProjectDom(title);
             //associate project dom to project
             _domModelProjectAssociator(projectDom, project);
+            _observeProjectButtons();
     }
 
     const _observeProjectForm = () => {
@@ -398,11 +439,10 @@ const SiteFacilitator = (() => {
             const notes = submitForm.elements['notes'].value;
             const toDo = ToDoFactory(title, description, dueDate, priority, notes);
             //current open project to-dos
-            let toDoList = project.getToDoList();
             ToDoController.addToDo(toDo, project);
-            DomManipulator.clearToDoListDom();
-            DomManipulator.loadToDoList(toDoList);
+            _loadToDoContent(project);
             DomManipulator.closeForm(submitForm);
+            
 
         });
         closeButton.addEventListener('click', () => {
@@ -411,7 +451,37 @@ const SiteFacilitator = (() => {
         });
     };
 
-    const observeProjectButtons = () => {
+    const _loadToDoContent = (project) => {
+            const toDoList = project.getToDoList();
+            DomManipulator.clearToDoContent();
+            DomManipulator.loadToDoButton();
+            toDoDomArray = DomManipulator.loadToDoList(toDoList);
+            _domModelToDoAssociator(toDoDomArray, toDoList);
+            _observeToDoButton(project);
+            _observeToDoListButtons();
+       
+    };
+
+    const _observeToDoListButtons = () => {
+        const toDoButtons = document.querySelectorAll('button.to-do');
+        
+        toDoButtons.forEach((toDoButton)=>{
+           
+            function callbackViewToDoModal(e){
+                const toDo = domModelToDoMap.get(e.target);
+                console.log('this works');
+                _openToDoModal(toDo);
+                
+            };
+            toDoButton.addEventListener('click', callbackViewToDoModal);
+        });
+    };
+
+    const _openToDoModal = (toDo) => {
+        
+    };
+
+    const _observeProjectButtons = () => {
         const projectButtons = document.querySelectorAll('button.project');
         projectButtons.forEach((projectButton)=>{
             //get stuff
@@ -421,17 +491,12 @@ const SiteFacilitator = (() => {
             //when dom is clicked, get it's project model
             //once project model is selected, get it's todo model
             //the todo model calls todo dom
-            function callbackViewToDo(e){
+            function callbackViewToDoList(e){
                 const project = domModelProjectMap.get(e.target);
-                console.log(domModelProjectMap);
-                const toDoList = project.getToDoList();
-                //Load to-do stuff
-                DomManipulator.loadToDoButton();
-                DomManipulator.loadToDoList(toDoList);
-                _observeToDoButton(project);
+                _loadToDoContent(project);
                 
             };
-            projectButton.addEventListener('click', callbackViewToDo);
+            projectButton.addEventListener('click', callbackViewToDoList);
         });
     };
 
@@ -439,7 +504,18 @@ const SiteFacilitator = (() => {
         domModelProjectMap.set(domElement, modelElement);
     };
 
-    return {observeProjectButton, observeProjectButtons, createProject};
+    const _domModelToDoAssociator = (domArray, modelList) => {
+        domModelToDoMap.clear();
+        console.log(domArray);
+        console.log(domModelToDoMap);
+        domArray.forEach((dom, index) => {
+            const model = modelList[index];
+            domModelToDoMap.set(dom, model);
+        });
+        
+    };
+
+    return {observeProjectButton, createProject};
 })();
 
 //first time loading site
@@ -449,25 +525,21 @@ const OnLoad = (() => {
     const loadInitialUI = () => {
         DomManipulator.loadProjectButton();
         DomManipulator.loadProjectList();
+        SiteFacilitator.observeProjectButton();
     };
     const addDefaultProject = () => {
         const title = "Default Project";
         SiteFacilitator.createProject(title);
         };
     
-    const loadObservers = () => {
-        SiteFacilitator.observeProjectButton();
-        SiteFacilitator.observeProjectButtons();
+   
 
-    }
-
-    return {loadInitialUI, addDefaultProject, loadObservers};
+    return {loadInitialUI, addDefaultProject};
 })();
 
 
 OnLoad.loadInitialUI();
 OnLoad.addDefaultProject();
-OnLoad.loadObservers();
 
 /*
 //mockup testing
@@ -506,5 +578,9 @@ console.log(project2.getToDoList()[0].getTitle());
 //open form only once until it's closed +1
 //createProject module+1
 
-//make new project button work
+//make new project button work +1
 
+//make to-dos into buttons +1
+
+//make to-do associator +1
+//open to-dos modal window; write_openToDoModal function
