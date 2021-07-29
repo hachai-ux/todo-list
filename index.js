@@ -13,9 +13,22 @@ const ToDoFactory = (title, description, dueDate, priority, notes) => {
 
     return {getTitle, getDescription, getDueDate, getPriority, getNotes,
         //setter needs to be declared in an object
+        set title(ti){
+            title = ti;
+        },
+        set description(des){
+            description = des;
+        },
+        set dueDate(date){
+            dueDate = date;
+        },
         set priority(prio){ 
             priority = prio;
+        },
+        set priority(n){
+            notes = n;
         }
+        
     };
 };
  
@@ -46,6 +59,15 @@ const ToDoController = (() => {
         project.getToDoList().push(toDo);
     };
 
+
+    const editToDo = (toDo, newTitle, newDescription, newDueDate, newPriority, newNotes) => {
+        toDo.title = newTitle;
+        toDo.description = newDescription;
+        toDo.dueDate = newDueDate;
+        toDo.priority = newPriority;
+        toDo.newNotes = newNotes;
+    };
+
     const completeToDo = (toDo, project)=>{
         const index = project.getToDoList().findIndex((toDo)=> toDo);
         //removes from todo-list after complete
@@ -60,7 +82,7 @@ const ToDoController = (() => {
         
     };
 
-    return{addToDo, completeToDo, changePriority}
+    return{addToDo, editToDo, completeToDo, changePriority}
 })();
 
 
@@ -278,7 +300,7 @@ const DomManipulator = (() => {
     inputPriorityMedium.classList.add('form-element');
     inputPriorityMedium.setAttribute('type','radio');
     inputPriorityMedium.setAttribute('name','priority');
-    inputPriorityMedium.setAttribute('name','medium-priority');
+    inputPriorityMedium.setAttribute('value','medium-priority');
 
     labelPriorityHigh.classList.add('form-element');
     labelPriorityHigh.setAttribute('for', 'priority');
@@ -286,7 +308,7 @@ const DomManipulator = (() => {
     inputPriorityHigh.classList.add('form-element');
     inputPriorityHigh.setAttribute('type','radio');
     inputPriorityHigh.setAttribute('name','priority');
-    inputPriorityHigh.setAttribute('name','high-priority');
+    inputPriorityHigh.setAttribute('value','high-priority');
 
     labelNotes.classList.add('form-element');
     labelNotes.setAttribute('for', 'notes');
@@ -327,6 +349,9 @@ const DomManipulator = (() => {
 
    const loadToDoList = (toDoList) => {
         //to-do-list div
+        if (toDoList[0] !== undefined){
+            console.log(toDoList[0].getTitle());
+        }
         const toDoListDom = document.createElement('div');
         const content = document.querySelector('div#content');
         toDoListDom.classList.add('to-do-list');
@@ -363,8 +388,166 @@ const DomManipulator = (() => {
         };
         
    };
+
+   const openEditToDoModal = (toDo) => {
+    const body = document.querySelector('body');
+    const modal = document.createElement('div');
+    modal.setAttribute('id', 'edit-to-do-modal')
+    modal.classList.add('modal');
+
+    const form = document.createElement('form');
+    form.classList.add('form');
+    form.setAttribute('id', 'edit-to-do-form');
+    form.setAttribute('onsubmit', 'return false');
+
+    /*
+    //x-button
+    const x = document.createElement('span');
+    x.classList.add('close');
+    x.textContent = '&times;';
+    */
+    console.log(toDo);
+
+    const title = toDo.getTitle();
+    const description = toDo.getDescription();
+    const dueDate = toDo.getDueDate();
+    const priority = toDo.getPriority(); 
+    const notes = toDo.getNotes(); 
+
+    const labelTitle = document.createElement('label');
+    const inputTitle = document.createElement('input');
+    const labelDescription = document.createElement('label');
+    const inputDescription = document.createElement('input');
+    const labelDueDate = document.createElement('label');
+    const inputDueDate = document.createElement('input');
+    const labelPriorityNone = document.createElement('label');
+    const inputPriorityNone = document.createElement('input');
+    const labelPriorityLow = document.createElement('label');
+    const inputPriorityLow = document.createElement('input');
+    const labelPriorityMedium = document.createElement('label');
+    const inputPriorityMedium = document.createElement('input');
+    const labelPriorityHigh = document.createElement('label');
+    const inputPriorityHigh = document.createElement('input');
+    const labelNotes = document.createElement('label');
+    const inputNotes = document.createElement('input');
+    const submit = document.createElement('button');
+    const close = document.createElement('button');
+
+    labelTitle.classList.add('form-element');
+    labelTitle.setAttribute('for', 'title');
+    labelTitle.textContent = "Title";
+    inputTitle.classList.add('form-element');
+    inputTitle.setAttribute('type','text');
+    inputTitle.setAttribute('name','title');
+    inputTitle.setAttribute('value', title);
+
+    labelDescription.classList.add('form-element');
+    labelDescription.setAttribute('for', 'description');
+    labelDescription.textContent = "Description";
+    inputDescription.classList.add('form-element');
+    inputDescription.setAttribute('type','text');
+    inputDescription.setAttribute('name','description');
+    inputDescription.setAttribute('value', description);
+
+    labelDueDate.classList.add('form-element');
+    labelDueDate.setAttribute('for', 'due-date');
+    labelDueDate.textContent = "Due Date";
+    inputDueDate.classList.add('form-element');
+    inputDueDate.setAttribute('type','date');
+    inputDueDate.setAttribute('name','due-date');
+    inputDueDate.setAttribute('value', dueDate);
+
+    //radio buttons
+    labelPriorityNone.classList.add('form-element');
+    labelPriorityNone.setAttribute('for', 'priority');
+    labelPriorityNone.textContent = "No Priority";
+    inputPriorityNone.classList.add('form-element');
+    inputPriorityNone.setAttribute('type','radio');
+    inputPriorityNone.setAttribute('name','priority');
+    inputPriorityNone.setAttribute('value','');
+
+    labelPriorityLow.classList.add('form-element');
+    labelPriorityLow.setAttribute('for', 'priority');
+    labelPriorityLow.textContent = "Low Priority";
+    inputPriorityLow.classList.add('form-element');
+    inputPriorityLow.setAttribute('type','radio');
+    inputPriorityLow.setAttribute('name','priority');
+    inputPriorityLow.setAttribute('value','low-priority');
+
+    labelPriorityMedium.classList.add('form-element');
+    labelPriorityMedium.setAttribute('for', 'priority');
+    labelPriorityMedium.textContent = "Medium Priority";
+    inputPriorityMedium.classList.add('form-element');
+    inputPriorityMedium.setAttribute('type','radio');
+    inputPriorityMedium.setAttribute('name','priority');
+    inputPriorityMedium.setAttribute('value','medium-priority');
+
+    labelPriorityHigh.classList.add('form-element');
+    labelPriorityHigh.setAttribute('for', 'priority');
+    labelPriorityHigh.textContent = "High Priority";
+    inputPriorityHigh.classList.add('form-element');
+    inputPriorityHigh.setAttribute('type','radio');
+    inputPriorityHigh.setAttribute('name','priority');
+    inputPriorityHigh.setAttribute('value','high-priority');
+
+    switch (priority) {
+        case "":
+          inputPriorityNone.checked = true;
+          break;
+        case "low-priority":
+          inputPriorityLow.checked = true;
+          break;
+        case "medium-priority":
+          inputPriorityMedium.checked = true;
+          break;
+        case "high-priority":
+          inputPriorityHigh.checked = true;
+          break;
+      };
+      
+    labelNotes.classList.add('form-element');
+    labelNotes.setAttribute('for', 'notes');
+    labelNotes.textContent = "Notes";
+    inputNotes.classList.add('form-element');
+    inputNotes.setAttribute('type','text');
+    inputNotes.setAttribute('name','notes');
+    inputNotes.setAttribute('value', notes);
+
+    submit.classList.add('form-element');
+    submit.setAttribute('type', 'submit');
+    submit.setAttribute('id', 'edit-to-do');
+    submit.textContent = "Add To-Do";
+    close.classList.add('form-element');
+    close.setAttribute('type', 'button');
+    close.setAttribute('id', 'close-edit-to-do');
+    close.textContent = "Cancel";
+
+    form.appendChild(labelTitle);
+    form.appendChild(inputTitle);
+    form.appendChild(labelDescription);
+    form.appendChild(inputDescription);
+    form.appendChild(labelDueDate);
+    form.appendChild(inputDueDate);
+    form.appendChild(labelPriorityNone);
+    form.appendChild(inputPriorityNone);
+    form.appendChild(labelPriorityLow);
+    form.appendChild(inputPriorityLow);
+    form.appendChild(labelPriorityMedium);
+    form.appendChild(inputPriorityMedium);
+    form.appendChild(labelPriorityHigh);
+    form.appendChild(inputPriorityHigh);
+    form.appendChild(labelNotes);
+    form.appendChild(inputNotes);
+    form.appendChild(submit);
+    form.appendChild(close);
+
+    modal.appendChild(form);
+    body.appendChild(modal);
+
     
-   return {loadProjectButton, loadToDoButton, loadProjectList, newProjectDom, openProjectForm, closeForm, openToDoForm, loadToDoList, clearToDoContent};
+};
+    
+   return {loadProjectButton, loadToDoButton, loadProjectList, newProjectDom, openProjectForm, closeForm, openToDoForm, loadToDoList, clearToDoContent, openEditToDoModal};
 })();
 
 
@@ -414,6 +597,7 @@ const SiteFacilitator = (() => {
             _observeProjectButtons();
     }
 
+
     const _observeProjectForm = () => {
         const submitForm = document.querySelector('form#add-project-form');
         const closeButton = document.querySelector('button#close-project-form');
@@ -456,182 +640,34 @@ const SiteFacilitator = (() => {
             DomManipulator.clearToDoContent();
             DomManipulator.loadToDoButton();
             toDoDomArray = DomManipulator.loadToDoList(toDoList);
+            if (toDoList[0] !== undefined){
+                console.log(toDoList[0].getTitle());
+            }
             _domModelToDoAssociator(toDoDomArray, toDoList);
             _observeToDoButton(project);
-            _observeToDoListButtons();
+            _observeToDoListButtons(project);
        
     };
 
-    const _observeToDoListButtons = () => {
+    const _observeToDoListButtons = (project) => {
         const toDoButtons = document.querySelectorAll('button.to-do');
         
-        toDoButtons.forEach((toDoButton)=>{
+        toDoButtons.forEach((toDoButton, index)=>{
            
             function callbackViewToDoModal(e){
                 const toDo = domModelToDoMap.get(e.target);
-                console.log('this works');
-                _openToDoModal(toDo);
-                
+                console.log(domModelToDoMap);
+                console.log(e.target);
+                //proper selection of the to-do element through bubbling
+               
+                DomManipulator.openEditToDoModal(toDo);
+                _observeEditToDoForm(toDo, index, project);
             };
             toDoButton.addEventListener('click', callbackViewToDoModal);
         });
     };
 
-    const _openToDoModal = (toDo) => {
-        const body = document.querySelector('body');
-        const modal = document.createElement('div');
-        modal.setAttribute('id', 'to-do-modal')
-        modal.classList.add('modal');
-
-        const form = document.createElement('form');
-        form.classList.add('form');
-        form.setAttribute('id', 'edit-todo');
-        form.setAttribute('onsubmit', 'return false');
-
-        /*
-        //x-button
-        const x = document.createElement('span');
-        x.classList.add('close');
-        x.textContent = '&times;';
-        */
-
-        const title = toDo.getTitle();
-        const description = toDo.getDescription();
-        const dueDate = toDo.getDueDate();
-        const priority = toDo.getPriority(); 
-        const notes = toDo.getNotes(); 
-
-        const labelTitle = document.createElement('label');
-        const inputTitle = document.createElement('input');
-        const labelDescription = document.createElement('label');
-        const inputDescription = document.createElement('input');
-        const labelDueDate = document.createElement('label');
-        const inputDueDate = document.createElement('input');
-        const labelPriorityNone = document.createElement('label');
-        const inputPriorityNone = document.createElement('input');
-        const labelPriorityLow = document.createElement('label');
-        const inputPriorityLow = document.createElement('input');
-        const labelPriorityMedium = document.createElement('label');
-        const inputPriorityMedium = document.createElement('input');
-        const labelPriorityHigh = document.createElement('label');
-        const inputPriorityHigh = document.createElement('input');
-        const labelNotes = document.createElement('label');
-        const inputNotes = document.createElement('input');
-        const submit = document.createElement('button');
-        const close = document.createElement('button');
-
-        labelTitle.classList.add('form-element');
-        labelTitle.setAttribute('for', 'title');
-        labelTitle.textContent = "Title";
-        inputTitle.classList.add('form-element');
-        inputTitle.setAttribute('type','text');
-        inputTitle.setAttribute('name','title');
-        inputTitle.setAttribute('value', title);
-
-        labelDescription.classList.add('form-element');
-        labelDescription.setAttribute('for', 'description');
-        labelDescription.textContent = "Description";
-        inputDescription.classList.add('form-element');
-        inputDescription.setAttribute('type','text');
-        inputDescription.setAttribute('name','description');
-        inputDescription.setAttribute('value', description);
-
-        labelDueDate.classList.add('form-element');
-        labelDueDate.setAttribute('for', 'due-date');
-        labelDueDate.textContent = "Due Date";
-        inputDueDate.classList.add('form-element');
-        inputDueDate.setAttribute('type','date');
-        inputDueDate.setAttribute('name','due-date');
-        inputDueDate.setAttribute('value', dueDate);
-
-        //radio buttons
-        labelPriorityNone.classList.add('form-element');
-        labelPriorityNone.setAttribute('for', 'priority');
-        labelPriorityNone.textContent = "No Priority";
-        inputPriorityNone.classList.add('form-element');
-        inputPriorityNone.setAttribute('type','radio');
-        inputPriorityNone.setAttribute('name','priority');
-        inputPriorityNone.setAttribute('value','');
-
-        labelPriorityLow.classList.add('form-element');
-        labelPriorityLow.setAttribute('for', 'priority');
-        labelPriorityLow.textContent = "Low Priority";
-        inputPriorityLow.classList.add('form-element');
-        inputPriorityLow.setAttribute('type','radio');
-        inputPriorityLow.setAttribute('name','priority');
-        inputPriorityLow.setAttribute('value','low-priority');
-
-        labelPriorityMedium.classList.add('form-element');
-        labelPriorityMedium.setAttribute('for', 'priority');
-        labelPriorityMedium.textContent = "Medium Priority";
-        inputPriorityMedium.classList.add('form-element');
-        inputPriorityMedium.setAttribute('type','radio');
-        inputPriorityMedium.setAttribute('name','priority');
-        inputPriorityMedium.setAttribute('name','medium-priority');
-
-        labelPriorityHigh.classList.add('form-element');
-        labelPriorityHigh.setAttribute('for', 'priority');
-        labelPriorityHigh.textContent = "High Priority";
-        inputPriorityHigh.classList.add('form-element');
-        inputPriorityHigh.setAttribute('type','radio');
-        inputPriorityHigh.setAttribute('name','priority');
-        inputPriorityHigh.setAttribute('name','high-priority');
-
-        switch (priority) {
-            case "":
-              inputPriorityNone.required = true;
-              break;
-            case "low-priority":
-              inputPriorityLow.required = true;
-              break;
-            case "medium-priority":
-              inputPriorityMedium.required = true;
-              break;
-            case "high-priority":
-              inputPriorityHigh.required = true;
-              break;
-          };
-          
-        labelNotes.classList.add('form-element');
-        labelNotes.setAttribute('for', 'notes');
-        labelNotes.textContent = "Notes";
-        inputNotes.classList.add('form-element');
-        inputNotes.setAttribute('type','text');
-        inputNotes.setAttribute('name','notes');
-        inputNotes.setAttribute('value', notes);
-
-        submit.classList.add('form-element');
-        submit.setAttribute('type', 'submit');
-        submit.setAttribute('id', 'submit-to-do');
-        submit.textContent = "Add To-Do";
-        close.classList.add('form-element');
-        close.setAttribute('type', 'button');
-        close.setAttribute('id', 'close-to-do-form');
-        close.textContent = "Cancel";
-
-        form.appendChild(labelTitle);
-        form.appendChild(inputTitle);
-        form.appendChild(labelDescription);
-        form.appendChild(inputDescription);
-        form.appendChild(labelDueDate);
-        form.appendChild(inputDueDate);
-        form.appendChild(labelPriorityNone);
-        form.appendChild(inputPriorityNone);
-        form.appendChild(labelPriorityLow);
-        form.appendChild(inputPriorityLow);
-        form.appendChild(labelPriorityMedium);
-        form.appendChild(inputPriorityMedium);
-        form.appendChild(labelPriorityHigh);
-        form.appendChild(inputPriorityHigh);
-        form.appendChild(labelNotes);
-        form.appendChild(inputNotes);
-        form.appendChild(submit);
-        form.appendChild(close);
-
-        modal.appendChild(form);
-        body.appendChild(modal);
     
-    };
 
     const _observeProjectButtons = () => {
         const projectButtons = document.querySelectorAll('button.project');
@@ -665,6 +701,36 @@ const SiteFacilitator = (() => {
             domModelToDoMap.set(dom, model);
         });
         
+    };
+
+    const _observeEditToDoForm = (toDo, index, project) => {
+        const modal = document.querySelector('div#edit-to-do-modal');
+        const form = document.querySelector('form#edit-to-do-form');
+        const closeButton = document.querySelector('form#edit-to-do-form>button#close-edit-to-do');
+        form.addEventListener('submit', () => {
+
+            const title = form.elements['title'].value;
+            const description = form.elements['description'].value;
+            const dueDate = form.elements['due-date'].value;
+            const priority = form.elements['priority'].value;
+            const notes = form.elements['notes'].value;
+
+            console.log(title);
+            ToDoController.editToDo(toDo, title, description, dueDate, priority, notes);
+            toDoList = project.getToDoList();
+            console.log(toDoList[index].getTitle());
+            
+            toDoList[index] = toDo;
+
+            DomManipulator.closeForm(modal);
+            _loadToDoContent(project);
+            //toDo needs to be associated with project.toDoList[i]
+
+        });
+        closeButton.addEventListener('click', () => {
+            DomManipulator.closeForm(modal);
+            
+        });
     };
 
     return {observeProjectButton, createProject};
