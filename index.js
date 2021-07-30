@@ -105,7 +105,7 @@ const DomManipulator = (() => {
         const content = document.querySelector('div#content');
         const addToDoButton = document.createElement('button');
 
-        addToDoButton.setAttribute('id','add-todo-button');
+        addToDoButton.setAttribute('id','add-to-do-button');
         addToDoButton.textContent = "Add To-Do";
 
         content.appendChild(addToDoButton);
@@ -170,10 +170,17 @@ const DomManipulator = (() => {
        //code showing only title
 
        const toDoList = document.querySelector('div.to-do-list'); //selects the first loaded to-do list
-       const toDo = document.createElement('button');
+       const toDo = document.createElement('span');
        const toDoTitle = document.createElement('p');
        const toDoDueDate = document.createElement('p');
+       const labelCheckbox = document.createElement('label');
+       const inputCheckbox = document.createElement('input');
  
+       labelCheckbox.classList.add('to-do-checkbox')
+       labelCheckbox.setAttribute('for', 'checkbox');
+       inputCheckbox.classList.add('to-do-checkbox');
+       inputCheckbox.setAttribute('type', 'checkbox');
+       inputCheckbox.setAttribute('name', 'checkbox');
 
        toDo.classList.add('to-do');
 
@@ -184,7 +191,8 @@ const DomManipulator = (() => {
        };
     
 
-
+       toDo.appendChild(labelCheckbox);
+       toDo.appendChild(inputCheckbox);
        toDo.appendChild(toDoTitle);
        toDo.appendChild(toDoDueDate);
        toDoList.appendChild(toDo);
@@ -199,6 +207,7 @@ const DomManipulator = (() => {
         const input = document.createElement('input');
         const submit = document.createElement('button');
         const close = document.createElement('button');
+        
     
         form.setAttribute('id', 'add-project-form');
         form.setAttribute('onsubmit', 'return false');
@@ -223,16 +232,23 @@ const DomManipulator = (() => {
         form.appendChild(submit);
         form.appendChild(close);
         body.appendChild(form);
-   }
-
-   const closeForm = (form) => {
-        const body = document.querySelector('body');
-        body.removeChild(form);
    };
+
+   const closeProjectForm = (form) => {
+    const body = document.querySelector('body');
+    body.removeChild(form);
+};
+
+   const closeToDoForm = (form) => {
+        const content = document.querySelector('div#content');
+        console.log('once');
+        content.removeChild(form);
+   };
+ 
 
    const openToDoForm = () => {
     const form = document.createElement('form');
-    const body = document.querySelector('body');
+    const content = document.querySelector('div#content');
     const labelTitle = document.createElement('label');
     const inputTitle = document.createElement('input');
     const labelDescription = document.createElement('label');
@@ -344,7 +360,7 @@ const DomManipulator = (() => {
     form.appendChild(inputNotes);
     form.appendChild(submit);
     form.appendChild(close);
-    body.appendChild(form);
+    content.appendChild(form);
    };
 
    const loadToDoList = (toDoList) => {
@@ -375,10 +391,18 @@ const DomManipulator = (() => {
         return toDoDomArray;
    };
 
+   const removeToDo = (toDoDom) => {
+       const toDoList = document.querySelector('div.to-do-list');
+
+       toDoList.removeChild(toDoDom);
+   }
+
    const clearToDoContent = () => {
         const content = document.querySelector('div#content');
+        /*
+        //backup
         const toDoListDom = document.querySelector('div.to-do-list');
-        const addToDoButton = document.querySelector('button#add-todo-button');
+        const addToDoButton = document.querySelector('button#add-to-do-button');
 
         if(toDoListDom !== null){
             content.removeChild(toDoListDom);
@@ -386,11 +410,16 @@ const DomManipulator = (() => {
         if(addToDoButton!== null){
             content.removeChild(addToDoButton);
         };
+        */
+
+        while (content.firstChild) {
+            content.removeChild(content.firstChild);
+        };
         
    };
 
    const openEditToDoModal = (toDo) => {
-    const body = document.querySelector('body');
+    const content = document.querySelector('div#content');
     const modal = document.createElement('div');
     modal.setAttribute('id', 'edit-to-do-modal')
     modal.classList.add('modal');
@@ -542,12 +571,12 @@ const DomManipulator = (() => {
     form.appendChild(close);
 
     modal.appendChild(form);
-    body.appendChild(modal);
+    content.appendChild(modal);
 
     
 };
     
-   return {loadProjectButton, loadToDoButton, loadProjectList, newProjectDom, openProjectForm, closeForm, openToDoForm, loadToDoList, clearToDoContent, openEditToDoModal};
+   return {loadProjectButton, loadToDoButton, loadProjectList, newProjectDom, openProjectForm, closeToDoForm, closeProjectForm, openToDoForm, loadToDoList, clearToDoContent, openEditToDoModal, removeToDo};
 })();
 
 
@@ -576,7 +605,7 @@ const SiteFacilitator = (() => {
     
 
     const _observeToDoButton = (project) => {
-        const addToDoButton = document.querySelector('button#add-todo-button');
+        const addToDoButton = document.querySelector('button#add-to-do-button');
         addToDoButton.addEventListener('click', () => {
             const existingForm = document.querySelector('form#add-to-do-form');
             console.log(existingForm);
@@ -604,11 +633,11 @@ const SiteFacilitator = (() => {
         submitForm.addEventListener('submit', () => {
             const title = submitForm.elements['title'].value;
             createProject(title);
-            DomManipulator.closeForm(submitForm);
+            DomManipulator.closeProjectForm(submitForm);
 
         });
         closeButton.addEventListener('click', () => {
-            DomManipulator.closeForm(submitForm);
+            DomManipulator.closeProjectForm(submitForm);
         })
     };
 
@@ -624,13 +653,14 @@ const SiteFacilitator = (() => {
             const toDo = ToDoFactory(title, description, dueDate, priority, notes);
             //current open project to-dos
             ToDoController.addToDo(toDo, project);
+            DomManipulator.closeToDoForm(submitForm);
             _loadToDoContent(project);
-            DomManipulator.closeForm(submitForm);
+         
             
 
         });
         closeButton.addEventListener('click', () => {
-            DomManipulator.closeForm(submitForm);
+            DomManipulator.closeToDoForm(submitForm);
             
         });
     };
@@ -645,25 +675,42 @@ const SiteFacilitator = (() => {
             }
             _domModelToDoAssociator(toDoDomArray, toDoList);
             _observeToDoButton(project);
+            _observeToDoCheckboxes(project);
             _observeToDoListButtons(project);
        
     };
 
     const _observeToDoListButtons = (project) => {
-        const toDoButtons = document.querySelectorAll('button.to-do');
+        const toDoButtons = document.querySelectorAll('span.to-do');
         
         toDoButtons.forEach((toDoButton, index)=>{
            
             function callbackViewToDoModal(e){
-                const toDo = domModelToDoMap.get(e.target);
-                console.log(domModelToDoMap);
-                console.log(e.target);
-                //proper selection of the to-do element through bubbling
-               
-                DomManipulator.openEditToDoModal(toDo);
-                _observeEditToDoForm(toDo, index, project);
+                //only fire if target is not a checkbox
+
+                if(e.target.getAttribute('type') !== 'checkbox'){
+                    const toDo = domModelToDoMap.get(e.currentTarget);
+
+                    console.log(e);
+                    //proper selection of the to-do element through bubbling
+                    const existingModal = document.querySelector('div#edit-to-do-modal');
+                    if(existingModal === null){
+                        DomManipulator.openEditToDoModal(toDo);
+                        _observeEditToDoForm(toDo, index, project);
+                        console.log('hello');
+                    };
+                };
+                
             };
             toDoButton.addEventListener('click', callbackViewToDoModal);
+        });
+    };
+
+    const _observeToDoCheckboxes = (project) => {
+        const toDoCheckboxes = document.querySelectorAll('div.to-do-list>span.to-do>input.to-do-checkbox');
+
+        toDoCheckboxes.forEach((toDoCheckbox, index) => { 
+        _observeToDoCheckbox(toDoCheckbox, index, project);
         });
     };
 
@@ -681,6 +728,7 @@ const SiteFacilitator = (() => {
             //the todo model calls todo dom
             function callbackViewToDoList(e){
                 const project = domModelProjectMap.get(e.target);
+                console.log(e.target);
                 _loadToDoContent(project);
                 
             };
@@ -722,13 +770,32 @@ const SiteFacilitator = (() => {
             
             toDoList[index] = toDo;
 
-            DomManipulator.closeForm(modal);
+            DomManipulator.closeToDoForm(modal);
             _loadToDoContent(project);
             //toDo needs to be associated with project.toDoList[i]
 
         });
         closeButton.addEventListener('click', () => {
-            DomManipulator.closeForm(modal);
+            DomManipulator.closeToDoForm(modal);
+            
+        });
+    };
+
+
+    const _observeToDoCheckbox = (checkbox, index, project) => {
+
+        //using 'change' doesnt work because this will fire the click event of observetodobuttons first
+        checkbox.addEventListener('change', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const toDoDom = e.currentTarget.parentElement;
+                console.log(e);
+                //remove to-do from to-do-list
+                toDoList = project.getToDoList();
+                toDoList.splice(index, 1);
+                DomManipulator.removeToDo(toDoDom);
+            
+
             
         });
     };
@@ -750,8 +817,6 @@ const OnLoad = (() => {
         SiteFacilitator.createProject(title);
         };
     
-   
-
     return {loadInitialUI, addDefaultProject};
 })();
 
@@ -802,4 +867,7 @@ console.log(project2.getToDoList()[0].getTitle());
 
 //make to-do associator +1
 //open to-dos modal window; write_openToDoModal function +1
-//make submit and cancel button working
+//make submit and cancel button working +1
+//open edit to-do form only once +1
+
+//delete to-do
