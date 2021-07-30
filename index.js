@@ -125,9 +125,10 @@ const DomManipulator = (() => {
 
 
    const newProjectDom = (title) => {
-        const project = document.createElement('button');
+        const project = document.createElement('a');
         const projectList = document.querySelector('div#project-list');
         project.classList.add('project');
+        project.setAttribute('href', '#');
         //project.setAttribute('id', `${title}-project-title`);
         project.textContent = title;
         projectList.appendChild(project);
@@ -717,7 +718,7 @@ const SiteFacilitator = (() => {
     
 
     const _observeProjectButtons = () => {
-        const projectButtons = document.querySelectorAll('button.project');
+        const projectButtons = document.querySelectorAll('a.project');
         projectButtons.forEach((projectButton)=>{
             //get stuff
             //no anonymous function because duplicate ones would not be the same
@@ -869,5 +870,11 @@ console.log(project2.getToDoList()[0].getTitle());
 //open to-dos modal window; write_openToDoModal function +1
 //make submit and cancel button working +1
 //open edit to-do form only once +1
+//delete to-do+1
 
-//delete to-do
+
+//make sidebar and content side by side +1
+//show projects in a vertical list +1
+//show to-dos in a vertical list +1
+//format to-dos in a set frame
+//make modal windows for adding and editing forms
