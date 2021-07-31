@@ -188,6 +188,8 @@ const DomManipulator = (() => {
        toDoTitle.textContent = title;
        toDoTitle.classList.add('to-do-title');
 
+       toDoDueDate.classList.add('due-date');
+
        if(dueDate !== ''){
         toDoDueDate.textContent = 'Due: ' + dueDate;
        };
@@ -203,14 +205,16 @@ const DomManipulator = (() => {
    };
 
    const openProjectForm = () => {
+        const modal = document.createElement('div');
         const form = document.createElement('form');
-        const body = document.querySelector('body');
+        const sidebar = document.querySelector('div#sidebar');
         const label = document.createElement('label');
         const input = document.createElement('input');
         const submit = document.createElement('button');
         const close = document.createElement('button');
         
     
+        modal.classList.add('modal');
         form.setAttribute('id', 'add-project-form');
         form.setAttribute('onsubmit', 'return false');
         label.classList.add('form-element');
@@ -229,26 +233,31 @@ const DomManipulator = (() => {
         close.setAttribute('id', 'close-project-form');
         close.textContent = "Cancel";
 
+      
         form.appendChild(label);
         form.appendChild(input);
         form.appendChild(submit);
         form.appendChild(close);
-        body.appendChild(form);
+        modal.appendChild(form);
+        sidebar.appendChild(modal);
    };
 
-   const closeProjectForm = (form) => {
-    const body = document.querySelector('body');
-    body.removeChild(form);
+   const closeProjectForm = (modal) => {
+    const sidebar = document.querySelector('div#sidebar');
+    console.log(modal);
+    sidebar.removeChild(modal);
 };
 
-   const closeToDoForm = (form) => {
+   const closeToDoForm = (modal) => {
         const content = document.querySelector('div#content');
-        console.log('once');
-        content.removeChild(form);
+        console.log(content);
+        console.log(modal);
+        content.removeChild(modal);
    };
  
 
    const openToDoForm = () => {
+    const modal = document.createElement('div');
     const form = document.createElement('form');
     const content = document.querySelector('div#content');
     const labelTitle = document.createElement('label');
@@ -270,6 +279,7 @@ const DomManipulator = (() => {
     const submit = document.createElement('button');
     const close = document.createElement('button');
 
+    modal.classList.add('modal');
     form.setAttribute('id', 'add-to-do-form');
     form.setAttribute('onsubmit', 'return false');
 
@@ -362,7 +372,8 @@ const DomManipulator = (() => {
     form.appendChild(inputNotes);
     form.appendChild(submit);
     form.appendChild(close);
-    content.appendChild(form);
+    modal.appendChild(form);
+    content.appendChild(modal);
    };
 
    const loadToDoList = (toDoList) => {
@@ -547,7 +558,7 @@ const DomManipulator = (() => {
     submit.classList.add('form-element');
     submit.setAttribute('type', 'submit');
     submit.setAttribute('id', 'edit-to-do');
-    submit.textContent = "Add To-Do";
+    submit.textContent = "Edit To-Do";
     close.classList.add('form-element');
     close.setAttribute('type', 'button');
     close.setAttribute('id', 'close-edit-to-do');
@@ -594,9 +605,11 @@ const SiteFacilitator = (() => {
         
         addProjectButton.addEventListener('click', () => {
             //add form to dom
-            const existingForm = document.querySelector('form#add-project-form');
+            const existingForm = document.querySelector('form');
             if (existingForm === null){
             DomManipulator.openProjectForm();
+            const modal = document.querySelector('div.modal');
+            modal.style.display = "block";
             _observeProjectForm();
             };
         });
@@ -609,10 +622,11 @@ const SiteFacilitator = (() => {
     const _observeToDoButton = (project) => {
         const addToDoButton = document.querySelector('button#add-to-do-button');
         addToDoButton.addEventListener('click', () => {
-            const existingForm = document.querySelector('form#add-to-do-form');
-            console.log(existingForm);
+            const existingForm = document.querySelector('form');
             if(existingForm === null){
             DomManipulator.openToDoForm();
+            const modal = document.querySelector('div.modal');
+            modal.style.display = "block";
             _observeToDoForm(project);
             };
         });
@@ -630,20 +644,25 @@ const SiteFacilitator = (() => {
 
 
     const _observeProjectForm = () => {
+        const modal = document.querySelector('div#sidebar>div.modal');
+        console.log(modal);
         const submitForm = document.querySelector('form#add-project-form');
         const closeButton = document.querySelector('button#close-project-form');
         submitForm.addEventListener('submit', () => {
             const title = submitForm.elements['title'].value;
             createProject(title);
-            DomManipulator.closeProjectForm(submitForm);
+            //close whole modal
+
+            DomManipulator.closeProjectForm(modal);
 
         });
         closeButton.addEventListener('click', () => {
-            DomManipulator.closeProjectForm(submitForm);
+            DomManipulator.closeProjectForm(modal);
         })
     };
 
     const _observeToDoForm = (project) => {
+        const modal = document.querySelector('div#content>div.modal');
         const submitForm = document.querySelector('form#add-to-do-form');
         const closeButton = document.querySelector('button#close-to-do-form');
         submitForm.addEventListener('submit', () => {
@@ -653,16 +672,17 @@ const SiteFacilitator = (() => {
             const priority = submitForm.elements['priority'].value;
             const notes = submitForm.elements['notes'].value;
             const toDo = ToDoFactory(title, description, dueDate, priority, notes);
+            console.log(modal);
             //current open project to-dos
             ToDoController.addToDo(toDo, project);
-            DomManipulator.closeToDoForm(submitForm);
+            DomManipulator.closeToDoForm(modal);
             _loadToDoContent(project);
          
             
 
         });
         closeButton.addEventListener('click', () => {
-            DomManipulator.closeToDoForm(submitForm);
+            DomManipulator.closeToDoForm(modal);
             
         });
     };
@@ -698,6 +718,8 @@ const SiteFacilitator = (() => {
                     const existingModal = document.querySelector('div#edit-to-do-modal');
                     if(existingModal === null){
                         DomManipulator.openEditToDoModal(toDo);
+                        const existingModal = document.querySelector('div#edit-to-do-modal');
+                        existingModal.style.display = "block";
                         _observeEditToDoForm(toDo, index, project);
                         console.log('hello');
                     };
@@ -877,5 +899,7 @@ console.log(project2.getToDoList()[0].getTitle());
 //make sidebar and content side by side +1
 //show projects in a vertical list +1
 //show to-dos in a vertical list +1
-//format to-dos in a set frame
+//format to-dos in a set frame +1
 //make modal windows for adding and editing forms
+
+//localStorage
