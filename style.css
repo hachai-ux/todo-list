@@ -35,16 +35,20 @@
   }
 
 .to-do {
-   display: flex;
-};
+    display: flex;
+}
 
-p {
-    flex: 1;
-    margin: 0px 0px;
-    font: 24px;
-};
+.to-do:hover {
+    background-color:#d9d9d9;
+}
+
 
 .to-do-checkbox {
-    flex: 1;
-    margin: 0px 0px ;
-};
+    flex: 0;
+    margin: 2px;
+}
+
+.to-do-title {
+    flex: 0;
+    margin: 0px;
+}

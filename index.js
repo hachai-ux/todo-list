@@ -186,6 +186,7 @@ const DomManipulator = (() => {
        toDo.classList.add('to-do');
 
        toDoTitle.textContent = title;
+       toDoTitle.classList.add('to-do-title');
 
        if(dueDate !== ''){
         toDoDueDate.textContent = 'Due: ' + dueDate;
