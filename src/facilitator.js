@@ -49,7 +49,7 @@ const SiteFacilitator = (() => {
             //associate project dom to project
             _domModelProjectAssociator(projectDom, project);
             _observeProjectButtons();
-            LocalStorageFacilitator.saveProjects();
+           
     }
 
 
@@ -64,7 +64,7 @@ const SiteFacilitator = (() => {
             //close whole modal
 
             DomManipulator.closeProjectForm(modal);
-            //LocalStorageFacilitator.saveProjects();
+            LocalStorageFacilitator.saveProjects();
         });
         closeButton.addEventListener('click', () => {
             DomManipulator.closeProjectForm(modal);
@@ -77,7 +77,7 @@ const SiteFacilitator = (() => {
         const toDo = ToDoFactory(title, description, dueDate, priority, notes);
         //current open project to-dos
         ToDoController.addToDo(toDo, project);
-        LocalStorageFacilitator.saveProjects();
+        
 
     };
 
@@ -94,6 +94,7 @@ const SiteFacilitator = (() => {
             createToDo(project, title, description, dueDate, priority, notes);
             DomManipulator.closeToDoForm(modal);
             _loadToDoContent(project);
+            LocalStorageFacilitator.saveProjects();
 
         });
         closeButton.addEventListener('click', () => {

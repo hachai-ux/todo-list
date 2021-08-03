@@ -6,13 +6,15 @@ import {LocalStorageFacilitator} from './storage.js';
 
 
 OnLoad.loadInitialUI();
+
 LocalStorageFacilitator.loadProjects();
+
+console.log(localStorage.getItem('projects'));
 
 if(localStorage.getItem('Projects') === null){
 OnLoad.addDefaultProject();
 };
 
-LocalStorageFacilitator.saveProjects();
 
 /*
 //mockup testing
@@ -68,4 +70,5 @@ console.log(project2.getToDoList()[0].getTitle());
 //format to-dos in a set frame +1
 //make modal windows for adding and editing forms
 
-//localStorage
+//localStorage +1
+//fix localStorage bugs(mistake in the load?)

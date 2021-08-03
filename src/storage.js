@@ -16,6 +16,7 @@ const LocalStorageFacilitator = (() => {
             const toDoListConverted = [];
             console.log(toDoList);
             toDoList.forEach((toDo)=>{
+                console.log('hello');
                 const toDoTitle = toDo.getTitle();
                 const toDoDescription = toDo.getDescription();
                 const toDoDueDate = toDo.getDueDate();
@@ -36,6 +37,7 @@ const LocalStorageFacilitator = (() => {
                 title,
                 toDoListConverted
             });
+            console.log(projectsStorage);
         });
         
     };
@@ -60,23 +62,31 @@ const LocalStorageFacilitator = (() => {
         let tempProjectStorage = [];
 
         tempProjectStorage = JSON.parse(localStorage.getItem('Projects'));
-        if (tempProjectStorage !== null){
+        console.log(tempProjectStorage);
+            if (tempProjectStorage !== null){
             tempProjectStorage.forEach((pseudoProject, index)=>{
+             //this index refers to the project index, not the toDoList index
             const projectTitle = pseudoProject.title;
             const toDoListConverted = pseudoProject.toDoListConverted;
             //load
             SiteFacilitator.createProject(projectTitle);
-
-            if (toDoListConverted.length > 0 ){
+            //since a project is created, saveProject is run again so it's buggy
+            console.log(toDoListConverted);
+            if (Array.isArray(toDoListConverted) && toDoListConverted !== 'undefined' && toDoListConverted.length !== 0){
                 console.log(toDoListConverted.length);
-                const toDoTitle = toDoListConverted[index].toDoTitle;
-                const toDoDescription = toDoListConverted[index].toDoDescription;
-                const toDoDueDate = toDoListConverted[index].toDoDueDate;
-                const toDoPriority = toDoListConverted[index].toDoPriority;
-                const toDoNotes = toDoListConverted[index].toDoNotes;
-                const projectList = ProjectController.getProjectList();
-                const project = projectList[index];
-                SiteFacilitator.createToDo(project, toDoTitle, toDoDescription, toDoDueDate, toDoPriority, toDoNotes);
+                console.log(toDoListConverted);
+                //this index needs to refer to the toDoList index
+                toDoListConverted.forEach((toDo)=>{
+                    const toDoTitle = toDo.toDoTitle;
+                    const toDoDescription = toDo.toDoDescription;
+                    const toDoDueDate = toDo.toDoDueDate;
+                    const toDoPriority = toDo.toDoPriority;
+                    const toDoNotes = toDo.toDoNotes;
+                    const projectList = ProjectController.getProjectList();
+                    const project = projectList[index];
+                    SiteFacilitator.createToDo(project, toDoTitle, toDoDescription, toDoDueDate, toDoPriority, toDoNotes);
+                });
+                
             };
             
             });
