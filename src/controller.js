@@ -1,16 +1,13 @@
 //manages a list of projects
 const ProjectController = (() => {
-    let projectList = [];
+    const projectList = [];
     const addProject = (project) => {
+   
         projectList.push(project);
     };
     const getProjectList = () => projectList;
 
-    return{addProject, getProjectList,
-        set projectList(pl){
-            projectList = pl;
-        }
-    };
+    return{addProject, getProjectList};
 })();
 
 
@@ -19,6 +16,7 @@ const ToDoController = (() => {
     //add a todo to a project
     const addToDo = (toDo, project) => {
         project.getToDoList().push(toDo);
+        console.log(project.getToDoList());
     };
 
 

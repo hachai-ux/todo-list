@@ -49,6 +49,7 @@ const SiteFacilitator = (() => {
             //associate project dom to project
             _domModelProjectAssociator(projectDom, project);
             _observeProjectButtons();
+            LocalStorageFacilitator.saveProjects();
     }
 
 
@@ -63,12 +64,20 @@ const SiteFacilitator = (() => {
             //close whole modal
 
             DomManipulator.closeProjectForm(modal);
-            LocalStorageFacilitator.saveProjects();
+            //LocalStorageFacilitator.saveProjects();
         });
         closeButton.addEventListener('click', () => {
             DomManipulator.closeProjectForm(modal);
         });
        
+
+    };
+
+    const createToDo = (project, title, description, dueDate, priority, notes) => {
+        const toDo = ToDoFactory(title, description, dueDate, priority, notes);
+        //current open project to-dos
+        ToDoController.addToDo(toDo, project);
+        LocalStorageFacilitator.saveProjects();
 
     };
 
@@ -82,14 +91,9 @@ const SiteFacilitator = (() => {
             const dueDate = submitForm.elements['due-date'].value;
             const priority = submitForm.elements['priority'].value;
             const notes = submitForm.elements['notes'].value;
-            const toDo = ToDoFactory(title, description, dueDate, priority, notes);
-            console.log(modal);
-            //current open project to-dos
-            ToDoController.addToDo(toDo, project);
+            createToDo(project, title, description, dueDate, priority, notes);
             DomManipulator.closeToDoForm(modal);
             _loadToDoContent(project);
-         
-            
 
         });
         closeButton.addEventListener('click', () => {
@@ -207,6 +211,7 @@ const SiteFacilitator = (() => {
 
             DomManipulator.closeToDoForm(modal);
             _loadToDoContent(project);
+            LocalStorageFacilitator.saveProjects();
             //toDo needs to be associated with project.toDoList[i]
 
         });
@@ -229,13 +234,13 @@ const SiteFacilitator = (() => {
                 const toDoList = project.getToDoList();
                 toDoList.splice(index, 1);
                 DomManipulator.removeToDo(toDoDom);
-            
+                LocalStorageFacilitator.saveProjects();
 
             
         });
     };
 
-    return {observeProjectButton, createProject};
+    return {observeProjectButton, createProject, createToDo};
 })();
 
 export {SiteFacilitator};

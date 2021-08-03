@@ -4,10 +4,15 @@ import {LocalStorageFacilitator} from './storage.js';
 
  
 
-LocalStorageFacilitator.loadProjects();
-OnLoad.loadInitialUI();
-OnLoad.addDefaultProject();
 
+OnLoad.loadInitialUI();
+LocalStorageFacilitator.loadProjects();
+
+if(localStorage.getItem('Projects') === null){
+OnLoad.addDefaultProject();
+};
+
+LocalStorageFacilitator.saveProjects();
 
 /*
 //mockup testing
